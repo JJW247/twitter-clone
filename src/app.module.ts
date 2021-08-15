@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { Users } from './users/entities/users.entity';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { TweetsModule } from './tweets/tweets.module';
+import { Tweets } from './tweets/entities/tweets.entity';
 
 @Module({
   imports: [
@@ -18,12 +20,13 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [Users],
+      entities: [Users, Tweets],
       synchronize: true,
       logging: true,
     }),
     UsersModule,
     AuthModule,
+    TweetsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
