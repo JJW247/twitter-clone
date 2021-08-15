@@ -1,6 +1,6 @@
 import { Common } from 'src/common/entities/common.entity';
 import { Users } from 'src/users/entities/users.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Tweets extends Common {
@@ -8,5 +8,6 @@ export class Tweets extends Common {
   tweet: string;
 
   @ManyToOne(() => Users, (users) => users.tweets)
+  @JoinColumn()
   user: Users;
 }

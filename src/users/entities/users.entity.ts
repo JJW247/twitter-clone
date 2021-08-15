@@ -11,7 +11,7 @@ export class Users extends Common {
   @Column('varchar')
   nickname: string;
 
-  @Column('varchar')
+  @Column('varchar', { select: false })
   password: string;
 
   @OneToMany(() => Tweets, (tweets) => tweets.tweet)

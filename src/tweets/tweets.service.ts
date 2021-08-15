@@ -20,12 +20,12 @@ export class TweetsService {
   }
 
   async getTweets(query) {
-    return await this.tweetsRepository.find({
-      skip: query.id,
-      take: 10,
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+    return await this.tweetsRepository
+      .createQueryBuilder('tweets')
+      .leftJoinAndSelect('tweets.user', 'user')
+      .orderBy('tweets.createdAt', 'DESC')
+      .take(10)
+      .skip(query.skip)
+      .getMany();
   }
 }
