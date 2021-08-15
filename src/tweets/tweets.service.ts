@@ -18,4 +18,14 @@ export class TweetsService {
       user: req.user,
     });
   }
+
+  async getTweets(query) {
+    return await this.tweetsRepository.find({
+      skip: query.id,
+      take: 10,
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
 }
