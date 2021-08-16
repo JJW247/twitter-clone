@@ -22,11 +22,15 @@ export class UsersService {
       createUserDto.password,
     );
 
-    return await this.usersRepository.save({
+    const user = await this.usersRepository.save({
       email: createUserDto.email,
       nickname: createUserDto.nickname,
       password: hashedPassword,
     });
+
+    const token = this.jwtService.sign({ id: user.id });
+
+    return { token };
   }
 
   async login(loginDto: LoginDto) {
