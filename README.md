@@ -4,3 +4,4 @@
 4. create user
 5. login
 6. create tweets
+7. get tweets

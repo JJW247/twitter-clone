@@ -34,6 +34,7 @@ export class UsersService {
       where: {
         email: loginDto.email,
       },
+      select: ['password'],
     });
 
     const checkPassword = await this.commonService.checkPassword(
