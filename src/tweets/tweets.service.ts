@@ -25,7 +25,7 @@ export class TweetsService {
       .leftJoinAndSelect('tweets.user', 'user')
       .orderBy('tweets.createdAt', 'DESC')
       .take(10)
-      .skip(query.skip)
+      .skip(query.page * 10)
       .getMany();
   }
 }
