@@ -48,6 +48,6 @@ export class UsersService {
 
     const token = this.jwtService.sign({ id: user.id });
 
-    return { ok: true, token };
+    return { token };
   }
 }
