@@ -15,7 +15,7 @@ import { Tweets } from './tweets/entities/tweets.entity';
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      ...(process.env.NODE_ENV === 'Production'
+      ...(process.env.NODE_ENV === 'production'
         ? { url: process.env.DATABASE_URL }
         : { host: process.env.DATABASE_HOST }),
       port: +process.env.DATABASE_PORT,
