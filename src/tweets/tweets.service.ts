@@ -25,7 +25,13 @@ export class TweetsService {
       .leftJoinAndSelect('tweets.user', 'user')
       .orderBy('tweets.createdAt', 'DESC')
       .take(10)
-      .skip(query.page * 10)
+      .skip(query.page ? query.page * 10 : 0)
       .getMany();
+  }
+
+  async deleteTweet(param: { tweetsId: string }) {
+    console.log(param);
+
+    return await this.tweetsRepository.softDelete({ id: +param.tweetsId });
   }
 }

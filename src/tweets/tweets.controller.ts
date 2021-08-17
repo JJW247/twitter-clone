@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Query,
   Request,
@@ -24,5 +26,10 @@ export class TweetsController {
   @Get()
   async getTweets(@Query() query) {
     return await this.tweetsService.getTweets(query);
+  }
+
+  @Delete(':tweetsId')
+  async deleteTweets(@Param() param) {
+    return await this.tweetsService.deleteTweet(param);
   }
 }
