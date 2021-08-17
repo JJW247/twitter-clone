@@ -18,7 +18,7 @@ import { Tweets } from './tweets/entities/tweets.entity';
       ...(process.env.NODE_ENV === 'production'
         ? {
             url: process.env.DATABASE_URL,
-            extra: { ssl: true, rejectUnauthorized: false },
+            extra: { ssl: { rejectUnauthorized: false } },
           }
         : {
             host: process.env.DATABASE_HOST,
