@@ -16,12 +16,14 @@ import { Tweets } from './tweets/entities/tweets.entity';
     TypeOrmModule.forRoot({
       type: 'postgres',
       ...(process.env.NODE_ENV === 'production'
-        ? { url: process.env.DATABASE_URL }
-        : { host: process.env.DATABASE_HOST }),
-      port: +process.env.DATABASE_PORT,
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_DATABASE,
+        ? { url: process.env.DATABASE_URL, ssl: true }
+        : {
+            host: process.env.DATABASE_HOST,
+            port: +process.env.DATABASE_PORT,
+            username: process.env.DATABASE_USERNAME,
+            password: process.env.DATABASE_PASSWORD,
+            database: process.env.DATABASE_DATABASE,
+          }),
       entities: [Users, Tweets],
       synchronize: true,
       logging: true,
