@@ -17,7 +17,7 @@ export class TweetsService {
   async createTweet(req: Request, createTweetDto: CreateTweetDto) {
     return await this.tweetsRepository.save({
       ...createTweetDto,
-      user: req.user,
+      users: req.user,
     });
   }
 
