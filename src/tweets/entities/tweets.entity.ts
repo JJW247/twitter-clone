@@ -9,5 +9,5 @@ export class Tweets extends Common {
 
   @ManyToOne(() => Users, (users) => users.tweets)
   @JoinColumn()
-  user: Users;
+  users: Users;
 }

@@ -22,7 +22,14 @@ export class TweetsService {
   async getTweets(query) {
     return await this.tweetsRepository
       .createQueryBuilder('tweets')
-      .leftJoinAndSelect('tweets.user', 'user')
+      .leftJoinAndSelect('tweets.users', 'users')
+      .select([
+        'tweets.id',
+        'tweets.tweet',
+        'tweets.createdAt',
+        'users.id',
+        'users.nickname',
+      ])
       .orderBy('tweets.createdAt', 'DESC')
       .take(10)
       .skip(query.page ? query.page * 10 : 0)
