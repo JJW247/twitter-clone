@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
+import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { CreateTweetDto } from './dtos/createTweet.dto';
 import { Tweets } from './entities/tweets.entity';
@@ -10,6 +11,7 @@ export class TweetsService {
   constructor(
     @InjectRepository(Tweets)
     private readonly tweetsRepository: Repository<Tweets>,
+    private readonly usersService: UsersService,
   ) {}
 
   async createTweet(req: Request, createTweetDto: CreateTweetDto) {
@@ -22,7 +24,7 @@ export class TweetsService {
   async getTweets(query) {
     return await this.tweetsRepository
       .createQueryBuilder('tweets')
-      .leftJoinAndSelect('tweets.users', 'users')
+      .leftJoin('tweets.users', 'users')
       .select([
         'tweets.id',
         'tweets.tweet',
@@ -36,8 +38,18 @@ export class TweetsService {
       .getMany();
   }
 
-  async deleteTweet(param: { tweetsId: string }) {
-    console.log(param);
+  async deleteTweet(req, param: { tweetsId: string }) {
+    const me = await this.usersService.getMe(req);
+    const tweet = await this.tweetsRepository
+      .createQueryBuilder('tweets')
+      .leftJoin('tweets.users', 'users')
+      .select(['tweets.id', 'users.id'])
+      .where('tweets.id = :tweetsId', { tweetsId: param.tweetsId })
+      .getOne();
+
+    if (me.userId !== tweet.users.id) {
+      throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
+    }
 
     return await this.tweetsRepository.softDelete({ id: +param.tweetsId });
   }

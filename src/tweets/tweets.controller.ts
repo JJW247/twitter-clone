@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  Req,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -28,8 +29,9 @@ export class TweetsController {
     return await this.tweetsService.getTweets(query);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':tweetsId')
-  async deleteTweets(@Param() param) {
-    return await this.tweetsService.deleteTweet(param);
+  async deleteTweets(@Req() req, @Param() param) {
+    return await this.tweetsService.deleteTweet(req, param);
   }
 }
