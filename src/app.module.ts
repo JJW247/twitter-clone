@@ -9,6 +9,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { TweetsModule } from './tweets/tweets.module';
 import { Tweets } from './tweets/entities/tweets.entity';
+import { LikesModule } from './likes/likes.module';
+import { Likes } from './likes/entities/likes.entity';
 
 @Module({
   imports: [
@@ -27,13 +29,14 @@ import { Tweets } from './tweets/entities/tweets.entity';
             password: process.env.DATABASE_PASSWORD,
             database: process.env.DATABASE_DATABASE,
           }),
-      entities: [Users, Tweets],
+      entities: [Users, Tweets, Likes],
       synchronize: true,
       logging: true,
     }),
     UsersModule,
     AuthModule,
     TweetsModule,
+    LikesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

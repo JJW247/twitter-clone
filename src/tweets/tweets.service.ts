@@ -40,6 +40,7 @@ export class TweetsService {
 
   async deleteTweet(req, param: { tweetsId: string }) {
     const me = await this.usersService.getMe(req);
+
     const tweet = await this.tweetsRepository
       .createQueryBuilder('tweets')
       .leftJoin('tweets.users', 'users')
