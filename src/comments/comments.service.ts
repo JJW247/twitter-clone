@@ -33,13 +33,25 @@ export class CommentsService {
   async getComments(param: {
     tweetsId: string;
   }): Promise<GetCommentsOutputDto[]> {
-    return await this.commentsRepository.find({
-      where: {
-        tweets: {
-          id: param.tweetsId,
-        },
-      },
-      select: ['id', 'createdAt', 'comment', 'users'],
+    return await this.commentsRepository
+      .createQueryBuilder('comments')
+      .leftJoin('comments.users', 'users')
+      .leftJoin('comments.tweets', 'tweets')
+      .where('tweets.id = :tweetsId', { tweetsId: param.tweetsId })
+      .select([
+        'comments.id',
+        'comments.comment',
+        'comments.createdAt',
+        'users.id',
+        'users.nickname',
+      ])
+      .orderBy('comments.createdAt', 'DESC')
+      .getMany();
+  }
+
+  async getCommentsCount(param: { tweetsId: string }): Promise<number> {
+    return this.commentsRepository.count({
+      where: { tweets: { id: param.tweetsId } },
     });
   }
 

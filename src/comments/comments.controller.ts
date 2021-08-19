@@ -60,6 +60,18 @@ export class CommentsController {
     return await this.commentsService.getComments(param);
   }
 
+  @ApiOperation({ summary: 'Get tweet count' })
+  @ApiOkResponse({
+    type: Number,
+  })
+  @ApiParam({ name: 'tweetsId', example: '1', description: 'tweetsId' })
+  @Get('count/tweets/:tweetsId')
+  async getCommentsCount(
+    @Param() param: { tweetsId: string },
+  ): Promise<number> {
+    return await this.commentsService.getCommentsCount(param);
+  }
+
   @ApiOperation({ summary: 'Delete comment' })
   @ApiOkResponse({
     type: UpdateResult,

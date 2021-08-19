@@ -31,7 +31,7 @@ export class LikesService {
     return this.likesRepository.save(like);
   }
 
-  async getTweetLikes(param: { tweetsId: string }): Promise<number> {
+  async getTweetLikesCount(param: { tweetsId: string }): Promise<number> {
     return this.likesRepository.count({
       where: { tweets: { id: param.tweetsId }, like: true },
     });
