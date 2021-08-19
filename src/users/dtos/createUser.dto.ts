@@ -1,16 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import { PickType } from '@nestjs/swagger';
+import { TokenDto } from 'src/common/dtos/common.dto';
+import { Users } from '../entities/users.entity';
 
-export class CreateUserDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+export class CreateUserInputDto extends PickType(Users, [
+  'email',
+  'nickname',
+  'password',
+] as const) {}
 
-  @IsString()
-  @Length(2, 10)
-  @IsNotEmpty()
-  nickname: string;
-
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-}
+export class CreateUserOutputDto extends TokenDto {}

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   CreateDateColumn,
   DeleteDateColumn,
@@ -8,12 +9,24 @@ import {
 
 @Entity()
 export class Common {
+  @ApiProperty({
+    example: 1,
+    description: 'id',
+  })
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty({
+    example: '2021-08-14 22:28:52.648696',
+    description: 'createdAt',
+  })
   @CreateDateColumn()
   createdAt: Date;
 
+  @ApiProperty({
+    example: '2021-08-14 22:28:52.648696',
+    description: 'createdAt',
+  })
   @UpdateDateColumn()
   updatedAt: Date;
 

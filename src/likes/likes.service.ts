@@ -11,7 +11,7 @@ export class LikesService {
     private readonly likesRepository: Repository<Likes>,
   ) {}
 
-  async likeTweet(req: Request, param: { tweetsId: string }) {
+  async likeTweet(req: Request, param: { tweetsId: string }): Promise<Likes> {
     const like = await this.likesRepository.findOne({
       where: {
         users: req.user,
@@ -31,13 +31,16 @@ export class LikesService {
     return this.likesRepository.save(like);
   }
 
-  async getTweetLikes(param: { tweetsId: string }) {
+  async getTweetLikes(param: { tweetsId: string }): Promise<number> {
     return this.likesRepository.count({
       where: { tweets: { id: param.tweetsId }, like: true },
     });
   }
 
-  async getTweetIsLike(req: Request, param: { tweetsId: string }) {
+  async getTweetIsLike(
+    req: Request,
+    param: { tweetsId: string },
+  ): Promise<Likes> {
     return this.likesRepository.findOne({
       where: {
         tweets: { id: param.tweetsId },

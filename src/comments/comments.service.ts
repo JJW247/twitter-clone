@@ -1,8 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
-import { Repository } from 'typeorm';
-import { CreateCommentDto } from './dtos/createComment.dto';
+import { Repository, UpdateResult } from 'typeorm';
+import {
+  CreateCommentInputDto,
+  CreateCommentOutputDto,
+} from './dtos/createComment.dto';
+import { GetCommentsOutputDto } from './dtos/getComments.dto';
 import { Comments } from './entities/comments.entity';
 
 @Injectable()
@@ -15,10 +19,10 @@ export class CommentsService {
   async createComment(
     req: Request,
     param: { tweetsId: string },
-    createCommentDto: CreateCommentDto,
-  ) {
+    createCommentInputDto: CreateCommentInputDto,
+  ): Promise<CreateCommentOutputDto> {
     return await this.commentsRepository.save({
-      comment: createCommentDto.comment,
+      comment: createCommentInputDto.comment,
       tweets: {
         id: +param.tweetsId,
       },
@@ -26,7 +30,9 @@ export class CommentsService {
     });
   }
 
-  async getComments(param: { tweetsId: string }) {
+  async getComments(param: {
+    tweetsId: string;
+  }): Promise<GetCommentsOutputDto[]> {
     return await this.commentsRepository.find({
       where: {
         tweets: {
@@ -37,7 +43,10 @@ export class CommentsService {
     });
   }
 
-  async deleteComment(req: Request, param: { commentsId: string }) {
+  async deleteComment(
+    req: Request,
+    param: { commentsId: string },
+  ): Promise<UpdateResult> {
     const comment = await this.commentsRepository.findOne({
       where: {
         id: param.commentsId,

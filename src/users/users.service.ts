@@ -2,12 +2,13 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CommonService } from 'src/common/common/common.service';
-import { CreateUserDto } from './dtos/createUser.dto';
+import { CommonService } from 'src/common/common.service';
+import { CreateUserInputDto, CreateUserOutputDto } from './dtos/createUser.dto';
 import { Users } from './entities/users.entity';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from './dtos/login.dto';
+import { LoginInputDto, LoginOutputDto } from './dtos/login.dto';
 import { Request } from 'express';
+import { GetMeOutputDto } from './dtos/getMe.dto';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +19,9 @@ export class UsersService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto) {
+  async createUser(
+    createUserDto: CreateUserInputDto,
+  ): Promise<CreateUserOutputDto> {
     const hashedPassword = await this.commonService.hashPassword(
       createUserDto.password,
     );
@@ -34,7 +37,7 @@ export class UsersService {
     return { token };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginInputDto): Promise<LoginOutputDto> {
     const user = await this.usersRepository.findOne({
       where: {
         email: loginDto.email,
@@ -56,7 +59,7 @@ export class UsersService {
     return { token };
   }
 
-  async getMe(req: Request) {
+  async getMe(req: Request): Promise<GetMeOutputDto> {
     return { userId: req.user };
   }
 }

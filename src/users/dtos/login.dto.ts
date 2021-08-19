@@ -1,9 +1,10 @@
-import { IsEmail, IsString } from 'class-validator';
+import { PickType } from '@nestjs/swagger';
+import { TokenDto } from 'src/common/dtos/common.dto';
+import { Users } from '../entities/users.entity';
 
-export class LoginDto {
-  @IsEmail()
-  email: string;
+export class LoginInputDto extends PickType(Users, [
+  'email',
+  'password',
+] as const) {}
 
-  @IsString()
-  password: string;
-}
+export class LoginOutputDto extends TokenDto {}

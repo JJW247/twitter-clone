@@ -1,8 +1,9 @@
 import { PickType } from '@nestjs/swagger';
 import { Comments } from '../entities/comments.entity';
 
-export class CreateCommentInputDto extends PickType(Comments, [
+export class GetCommentsOutputDto extends PickType(Comments, [
+  'id',
+  'createdAt',
   'comment',
+  'users',
 ] as const) {}
-
-export class CreateCommentOutputDto extends Comments {}
