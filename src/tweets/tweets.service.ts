@@ -41,16 +41,16 @@ export class TweetsService {
   async deleteTweet(req, param: { tweetsId: string }) {
     const me = await this.usersService.getMe(req);
 
-    const tweet = await this.tweetsRepository
-      .createQueryBuilder('tweets')
-      .leftJoin('tweets.users', 'users')
-      .select(['tweets.id', 'users.id'])
-      .where('tweets.id = :tweetsId', { tweetsId: param.tweetsId })
-      .getOne();
+    const tweet = await this.tweetsRepository.findOne({
+      where: {
+        id: param.tweetsId,
+        users: {
+          id: me.userId,
+        },
+      },
+    });
 
-    if (me.userId !== tweet.users.id) {
-      throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
-    }
+    if (!tweet) throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN);
 
     return await this.tweetsRepository.softDelete({ id: +param.tweetsId });
   }
