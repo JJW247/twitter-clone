@@ -57,6 +57,6 @@ export class UsersService {
   }
 
   async getMe(req: Request) {
-    return req.user;
+    return { userId: req.user };
   }
 }
