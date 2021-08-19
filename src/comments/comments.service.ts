@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersService } from 'src/users/users.service';
+import { Request } from 'express';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dtos/createComment.dto';
 import { Comments } from './entities/comments.entity';
@@ -10,24 +10,19 @@ export class CommentsService {
   constructor(
     @InjectRepository(Comments)
     private readonly commentsRepository: Repository<Comments>,
-    private readonly usersService: UsersService,
   ) {}
 
   async createComment(
-    req,
+    req: Request,
     param: { tweetsId: string },
     createCommentDto: CreateCommentDto,
   ) {
-    const me = await this.usersService.getMe(req);
-
     return await this.commentsRepository.save({
       comment: createCommentDto.comment,
       tweets: {
         id: +param.tweetsId,
       },
-      users: {
-        id: me.userId,
-      },
+      users: req.user,
     });
   }
 
@@ -42,15 +37,11 @@ export class CommentsService {
     });
   }
 
-  async deleteComment(req, param: { commentsId: string }) {
-    const me = await this.usersService.getMe(req);
-
+  async deleteComment(req: Request, param: { commentsId: string }) {
     const comment = await this.commentsRepository.findOne({
       where: {
         id: param.commentsId,
-        users: {
-          id: me.userId,
-        },
+        users: req.user,
       },
     });
 

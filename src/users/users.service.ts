@@ -54,12 +54,4 @@ export class UsersService {
 
     return { token };
   }
-
-  async getMe(req) {
-    const token = req.headers.authorization.substring(7);
-
-    const verifyToken = this.jwtService.verify(token);
-
-    return { userId: verifyToken.id };
-  }
 }

@@ -1,5 +1,6 @@
-import { Injectable, Req } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Request } from 'express';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { Likes } from './entities/likes.entity';
@@ -12,19 +13,17 @@ export class LikesService {
     private readonly usersService: UsersService,
   ) {}
 
-  async likeTweet(req, param: { tweetsId: string }) {
-    const me = await this.usersService.getMe(req);
-
+  async likeTweet(req: Request, param: { tweetsId: string }) {
     const like = await this.likesRepository.findOne({
       where: {
         tweets: { id: param.tweetsId },
-        users: { id: me.userId },
+        users: req.user,
       },
     });
 
     if (!like) {
       return await this.likesRepository.save({
-        users: { id: me.userId },
+        users: req.user,
         tweets: { id: +param.tweetsId },
       });
     }
@@ -40,13 +39,11 @@ export class LikesService {
     });
   }
 
-  async getTweetIsLike(req, param: { tweetsId: string }) {
-    const me = await this.usersService.getMe(req);
-
+  async getTweetIsLike(req: Request, param: { tweetsId: string }) {
     return this.likesRepository.findOne({
       where: {
         tweets: { id: param.tweetsId },
-        users: { id: me.userId },
+        users: req.user,
       },
       select: ['like'],
     });

@@ -38,15 +38,11 @@ export class TweetsService {
       .getMany();
   }
 
-  async deleteTweet(req, param: { tweetsId: string }) {
-    const me = await this.usersService.getMe(req);
-
+  async deleteTweet(req: Request, param: { tweetsId: string }) {
     const tweet = await this.tweetsRepository.findOne({
       where: {
         id: param.tweetsId,
-        users: {
-          id: me.userId,
-        },
+        users: req.user,
       },
     });
 
