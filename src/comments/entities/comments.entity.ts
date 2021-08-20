@@ -24,8 +24,7 @@ export class Comments extends Common {
   users: Users;
 
   @ManyToOne(() => Tweets, (tweets) => tweets.comments, {
-    onDelete: 'SET NULL',
-    onUpdate: 'CASCADE',
+    cascade: ['soft-remove'],
   })
   @JoinColumn()
   tweets: Tweets;

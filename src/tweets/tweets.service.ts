@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
+import { Comments } from 'src/comments/entities/comments.entity';
+import { Likes } from 'src/likes/entities/likes.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import {
   CreateTweetInputDto,
@@ -14,6 +16,10 @@ export class TweetsService {
   constructor(
     @InjectRepository(Tweets)
     private readonly tweetsRepository: Repository<Tweets>,
+    @InjectRepository(Comments)
+    private readonly commentsRepository: Repository<Comments>,
+    @InjectRepository(Likes)
+    private readonly likesRepository: Repository<Likes>,
   ) {}
 
   async createTweet(
@@ -56,6 +62,32 @@ export class TweetsService {
 
     if (!tweet)
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+
+    const comments = await this.commentsRepository.find({
+      where: {
+        tweets: {
+          id: tweet.id,
+        },
+      },
+    });
+    const likes = await this.likesRepository.find({
+      where: {
+        tweets: {
+          id: tweet.id,
+        },
+      },
+    });
+
+    if (comments.length !== 0) {
+      await comments.map((comment) =>
+        this.commentsRepository.softDelete({ id: comment.id }),
+      );
+    }
+    if (likes.length !== 0) {
+      await likes.map((like) =>
+        this.likesRepository.softDelete({ id: like.id }),
+      );
+    }
 
     return await this.tweetsRepository.softDelete({ id: +param.tweetsId });
   }
