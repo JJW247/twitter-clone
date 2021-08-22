@@ -9,12 +9,15 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginInputDto, LoginOutputDto } from './dtos/login.dto';
 import { Request } from 'express';
 import { GetMeOutputDto } from './dtos/getMe.dto';
+import { Follows } from './entities/follows.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(Users)
     private readonly usersRepository: Repository<Users>,
+    @InjectRepository(Follows)
+    private readonly followsRepository: Repository<Follows>,
     private readonly commonService: CommonService,
     private readonly jwtService: JwtService,
   ) {}
@@ -45,14 +48,16 @@ export class UsersService {
       select: ['id', 'password'],
     });
 
+    if (!user)
+      throw new HttpException('Not exist user.', HttpStatus.BAD_REQUEST);
+
     const checkPassword = await this.commonService.checkPassword(
       loginDto.password,
       user.password,
     );
 
-    if (!checkPassword) {
+    if (!checkPassword)
       throw new HttpException('Wrong password.', HttpStatus.UNAUTHORIZED);
-    }
 
     const token = this.jwtService.sign({ id: user.id });
 
@@ -61,5 +66,51 @@ export class UsersService {
 
   async getMe(req: Request): Promise<GetMeOutputDto> {
     return { userId: req.user };
+  }
+
+  async follow(req: Request, param: { userId: string }) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        id: param.userId,
+      },
+    });
+
+    if (!user)
+      throw new HttpException('Not exist user.', HttpStatus.BAD_REQUEST);
+    if (req.user === user.id)
+      throw new HttpException(
+        "You can't follow yourself.",
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const existFollow = await this.followsRepository.findOne({
+      where: {
+        follower: req.user,
+        following: user.id,
+      },
+    });
+
+    if (existFollow) {
+      await this.followsRepository.delete({ id: existFollow.id });
+      return { existFollow, deleted: true };
+    }
+    const follow = await this.followsRepository.create({
+      follower: req.user,
+      following: user,
+    });
+
+    return await this.followsRepository.save(follow);
+  }
+
+  async getFollower(req: Request) {
+    const follow = await this.followsRepository
+      .createQueryBuilder('follows')
+      .leftJoin('follows.follower', 'follower')
+      .leftJoin('follows.following', 'following')
+      .where('follower.id = :followerId', { followerId: req.user })
+      .select(['follows.id', 'follower.id', 'following.id'])
+      .getMany();
+
+    return follow;
   }
 }

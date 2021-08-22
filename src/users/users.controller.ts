@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -50,5 +59,19 @@ export class UsersController {
   @Get('me')
   async getMe(@Req() req: Request): Promise<GetMeOutputDto> {
     return await this.usersService.getMe(req);
+  }
+
+  @ApiOperation({ summary: 'Follow' })
+  @ApiOkResponse()
+  @UseGuards(JwtAuthGuard)
+  @Post('follow/:userId')
+  async follow(@Req() req: Request, @Param() param: { userId: string }) {
+    return await this.usersService.follow(req, param);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('follower')
+  async getFollower(@Req() req: Request) {
+    return await this.usersService.getFollower(req);
   }
 }

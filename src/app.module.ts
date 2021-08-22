@@ -11,6 +11,7 @@ import { LikesModule } from './likes/likes.module';
 import { Likes } from './likes/entities/likes.entity';
 import { Comments } from './comments/entities/comments.entity';
 import { CommentsModule } from './comments/comments.module';
+import { Follows } from './users/entities/follows.entity';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { CommentsModule } from './comments/comments.module';
             password: process.env.DATABASE_PASSWORD,
             database: process.env.DATABASE_DATABASE,
           }),
-      entities: [Users, Tweets, Likes, Comments],
+      entities: [Users, Tweets, Likes, Comments, Follows],
       synchronize: true,
       logging: true,
     }),

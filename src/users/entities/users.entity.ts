@@ -6,6 +6,7 @@ import { Common } from 'src/common/entities/common.entity';
 import { Tweets } from 'src/tweets/entities/tweets.entity';
 import { Likes } from 'src/likes/entities/likes.entity';
 import { Comments } from 'src/comments/entities/comments.entity';
+import { Follows } from './follows.entity';
 
 @Entity()
 export class Users extends Common {
@@ -45,4 +46,10 @@ export class Users extends Common {
 
   @OneToMany(() => Comments, (comments) => comments.users)
   comments: Comments[];
+
+  @OneToMany(() => Follows, (follow) => follow.follower)
+  followers: Follows[];
+
+  @OneToMany(() => Follows, (follow) => follow.following)
+  followings: Follows[];
 }
