@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Param } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -10,7 +10,12 @@ import { LoginInputDto, LoginOutputDto } from './dtos/login.dto';
 import { Request } from 'express';
 import { GetMeOutputDto } from './dtos/getMe.dto';
 import { Follows } from './entities/follows.entity';
-import { FixIntroduceDto } from './dtos/fixIntroduce.dto';
+import { GetFollowOutputDto } from './dtos/getFollow.dto';
+import { GetProfileOutputDto } from './dtos/getProfile.dto';
+import {
+  ModifyIntroduceInputDto,
+  ModifyIntroduceOutputDto,
+} from './dtos/modifyIntroduce.dto';
 
 @Injectable()
 export class UsersService {
@@ -69,7 +74,7 @@ export class UsersService {
     return { userId: req.user };
   }
 
-  async follow(req: Request, param: { userId: string }) {
+  async follow(req: Request, param: { userId: string }): Promise<Follows> {
     const user = await this.usersRepository.findOne({
       where: {
         id: param.userId,
@@ -81,7 +86,7 @@ export class UsersService {
     if (req.user === user.id)
       throw new HttpException(
         "You can't follow yourself.",
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.UNAUTHORIZED,
       );
 
     const existFollow = await this.followsRepository.findOne({
@@ -93,7 +98,7 @@ export class UsersService {
 
     if (existFollow) {
       await this.followsRepository.delete({ id: existFollow.id });
-      return { existFollow, deleted: true };
+      return existFollow;
     }
     const follow = await this.followsRepository.create({
       follower: req.user,
@@ -103,8 +108,8 @@ export class UsersService {
     return await this.followsRepository.save(follow);
   }
 
-  async getFollower(req: Request) {
-    const follow = await this.followsRepository
+  async getFollower(req: Request): Promise<GetFollowOutputDto[]> {
+    const follows = await this.followsRepository
       .createQueryBuilder('follows')
       .leftJoin('follows.follower', 'follower')
       .leftJoin('follows.following', 'following')
@@ -112,10 +117,10 @@ export class UsersService {
       .select(['follows.id', 'follower.id', 'following.id'])
       .getMany();
 
-    return follow;
+    return follows;
   }
 
-  async getProfile(param: { userId: string }) {
+  async getProfile(param: { userId: string }): Promise<GetProfileOutputDto> {
     const user = await this.usersRepository
       .createQueryBuilder('users')
       .leftJoin('users.followers', 'followers')
@@ -138,14 +143,17 @@ export class UsersService {
     return user;
   }
 
-  async fixIntroduce(req: Request, fixIntroduceDto: FixIntroduceDto) {
+  async modifyIntroduce(
+    req: Request,
+    modifyIntroduceInputDto: ModifyIntroduceInputDto,
+  ): Promise<ModifyIntroduceOutputDto> {
     const user = await this.usersRepository.findOne({
       where: {
         id: req.user,
       },
     });
 
-    user.introduce = fixIntroduceDto.introduce;
+    user.introduce = modifyIntroduceInputDto.introduce;
 
     return await this.usersRepository.save(user);
   }

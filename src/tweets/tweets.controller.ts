@@ -60,6 +60,28 @@ export class TweetsController {
     return await this.tweetsService.getTweets(query);
   }
 
+  @ApiOperation({ summary: `Get tweets - TWEETS_PAGE: ${TWEETS_PAGE}` })
+  @ApiOkResponse({
+    description: 'Get tweets',
+  })
+  @ApiQuery({
+    name: 'page',
+    example: 'http://localhost:3010/3/tweets?page=1',
+    description: 'Tweets page',
+  })
+  @ApiParam({
+    name: 'userId',
+    example: 'http://localhost:3010/3/tweets?page=1',
+    description: 'User id for profile page',
+  })
+  @Get(':userId')
+  async getProfileTweets(
+    @Query() query,
+    @Param() param: { userId: string },
+  ): Promise<Tweets[]> {
+    return await this.tweetsService.getProfileTweets(query, param);
+  }
+
   @ApiOperation({ summary: 'Delete tweet' })
   @ApiOkResponse({
     description: 'Delete tweet',

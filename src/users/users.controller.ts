@@ -18,9 +18,16 @@ import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 import { CreateUserInputDto, CreateUserOutputDto } from './dtos/createUser.dto';
-import { FixIntroduceDto } from './dtos/fixIntroduce.dto';
+import { FollowOutputDto } from './dtos/follow.dto';
+import { GetFollowOutputDto } from './dtos/getFollow.dto';
 import { GetMeOutputDto } from './dtos/getMe.dto';
+import { GetProfileOutputDto } from './dtos/getProfile.dto';
 import { LoginInputDto, LoginOutputDto } from './dtos/login.dto';
+import {
+  ModifyIntroduceInputDto,
+  ModifyIntroduceOutputDto,
+} from './dtos/modifyIntroduce.dto';
+import { Follows } from './entities/follows.entity';
 import { UsersService } from './users.service';
 
 @ApiTags('users')
@@ -62,31 +69,65 @@ export class UsersController {
     return await this.usersService.getMe(req);
   }
 
-  @ApiOperation({ summary: 'Follow' })
-  @ApiOkResponse()
+  @ApiOperation({ summary: 'Follow user' })
+  @ApiOkResponse({
+    type: FollowOutputDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Not exist user.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: "You can't follow yourself.",
+  })
   @UseGuards(JwtAuthGuard)
   @Post('follow/:userId')
-  async follow(@Req() req: Request, @Param() param: { userId: string }) {
+  async follow(
+    @Req() req: Request,
+    @Param() param: { userId: string },
+  ): Promise<Follows> {
     return await this.usersService.follow(req, param);
   }
 
+  @ApiOperation({ summary: 'Get user all follow' })
+  @ApiOkResponse({
+    type: [GetFollowOutputDto],
+  })
   @UseGuards(JwtAuthGuard)
   @Get('follower')
   async getFollower(@Req() req: Request) {
     return await this.usersService.getFollower(req);
   }
 
+  @ApiOperation({ summary: 'Get user profile infomation.' })
+  @ApiOkResponse({
+    type: [GetProfileOutputDto],
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Not exist user',
+  })
   @Get('profile/:userId')
-  async getProfile(@Param() param: { userId: string }) {
+  async getProfile(
+    @Param() param: { userId: string },
+  ): Promise<GetProfileOutputDto> {
     return await this.usersService.getProfile(param);
   }
 
+  @ApiOperation({ summary: 'Modify my introduce.' })
+  @ApiOkResponse({
+    type: [ModifyIntroduceOutputDto],
+  })
   @UseGuards(JwtAuthGuard)
   @Put('introduce/:userId')
-  async fixIntroduce(
+  async modifyIntroduce(
     @Req() req: Request,
-    @Body() fixIntroduceDto: FixIntroduceDto,
-  ) {
-    return await this.usersService.fixIntroduce(req, fixIntroduceDto);
+    @Body() modifyIntroduceInputDto: ModifyIntroduceInputDto,
+  ): Promise<ModifyIntroduceOutputDto> {
+    return await this.usersService.modifyIntroduce(
+      req,
+      modifyIntroduceInputDto,
+    );
   }
 }
