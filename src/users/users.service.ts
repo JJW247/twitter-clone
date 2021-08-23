@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Param } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -10,6 +10,7 @@ import { LoginInputDto, LoginOutputDto } from './dtos/login.dto';
 import { Request } from 'express';
 import { GetMeOutputDto } from './dtos/getMe.dto';
 import { Follows } from './entities/follows.entity';
+import { FixIntroduceDto } from './dtos/fixIntroduce.dto';
 
 @Injectable()
 export class UsersService {
@@ -112,5 +113,40 @@ export class UsersService {
       .getMany();
 
     return follow;
+  }
+
+  async getProfile(param: { userId: string }) {
+    const user = await this.usersRepository
+      .createQueryBuilder('users')
+      .leftJoin('users.followers', 'followers')
+      .leftJoin('users.followings', 'followings')
+      .leftJoin('users.tweets', 'tweets')
+      .where('users.id = :userId', { userId: param.userId })
+      .select([
+        'users.id',
+        'users.nickname',
+        'users.introduce',
+        'followers.id',
+        'followings.id',
+        'tweets.id',
+      ])
+      .getOne();
+
+    if (!user)
+      throw new HttpException('Not exist user', HttpStatus.BAD_REQUEST);
+
+    return user;
+  }
+
+  async fixIntroduce(req: Request, fixIntroduceDto: FixIntroduceDto) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        id: req.user,
+      },
+    });
+
+    user.introduce = fixIntroduceDto.introduce;
+
+    return await this.usersRepository.save(user);
   }
 }

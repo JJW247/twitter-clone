@@ -18,6 +18,7 @@ import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 import { CreateUserInputDto, CreateUserOutputDto } from './dtos/createUser.dto';
+import { FixIntroduceDto } from './dtos/fixIntroduce.dto';
 import { GetMeOutputDto } from './dtos/getMe.dto';
 import { LoginInputDto, LoginOutputDto } from './dtos/login.dto';
 import { UsersService } from './users.service';
@@ -73,5 +74,19 @@ export class UsersController {
   @Get('follower')
   async getFollower(@Req() req: Request) {
     return await this.usersService.getFollower(req);
+  }
+
+  @Get('profile/:userId')
+  async getProfile(@Param() param: { userId: string }) {
+    return await this.usersService.getProfile(param);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('introduce/:userId')
+  async fixIntroduce(
+    @Req() req: Request,
+    @Body() fixIntroduceDto: FixIntroduceDto,
+  ) {
+    return await this.usersService.fixIntroduce(req, fixIntroduceDto);
   }
 }

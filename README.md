@@ -10,3 +10,4 @@
 
 - comments
 - swagger
+- users swagger fix

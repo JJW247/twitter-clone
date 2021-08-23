@@ -38,6 +38,14 @@ export class Users extends Common {
   @Column('varchar', { select: false })
   password: string;
 
+  @ApiProperty({
+    example: 'Hello, world!',
+    description: 'My introduce',
+  })
+  @IsNotEmpty()
+  @Column('varchar', { default: null })
+  introduce: string;
+
   @OneToMany(() => Tweets, (tweets) => tweets.users)
   tweets: Tweets[];
 
