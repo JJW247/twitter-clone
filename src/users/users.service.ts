@@ -8,7 +8,6 @@ import { Users } from './entities/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { LoginInputDto, LoginOutputDto } from './dtos/login.dto';
 import { Request } from 'express';
-import { GetMeOutputDto } from './dtos/getMe.dto';
 import { Follows } from './entities/follows.entity';
 import { GetFollowOutputDto } from './dtos/getFollow.dto';
 import { GetProfileOutputDto } from './dtos/getProfile.dto';
@@ -70,8 +69,8 @@ export class UsersService {
     return { token };
   }
 
-  async getMe(req: Request): Promise<GetMeOutputDto> {
-    return { userId: req.user };
+  async getMe(req: Request): Promise<number> {
+    return +req.user;
   }
 
   async follow(req: Request, param: { userId: string }): Promise<Follows> {

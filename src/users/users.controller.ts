@@ -20,7 +20,6 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { CreateUserInputDto, CreateUserOutputDto } from './dtos/createUser.dto';
 import { FollowOutputDto } from './dtos/follow.dto';
 import { GetFollowOutputDto } from './dtos/getFollow.dto';
-import { GetMeOutputDto } from './dtos/getMe.dto';
 import { GetProfileOutputDto } from './dtos/getProfile.dto';
 import { LoginInputDto, LoginOutputDto } from './dtos/login.dto';
 import {
@@ -61,11 +60,11 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Get me - user id' })
   @ApiOkResponse({
-    type: GetMeOutputDto,
+    type: Number,
   })
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async getMe(@Req() req: Request): Promise<GetMeOutputDto> {
+  async getMe(@Req() req: Request): Promise<number> {
     return await this.usersService.getMe(req);
   }
 
