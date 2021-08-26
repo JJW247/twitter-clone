@@ -25,7 +25,7 @@ export class Tweets extends Common {
   @JoinColumn()
   users: Users;
 
-  @OneToMany(() => Likes, (likes) => likes.users)
+  @OneToMany(() => Likes, (likes) => likes.tweets)
   likes: Likes[];
 
   @OneToMany(() => Comments, (comments) => comments.tweets)

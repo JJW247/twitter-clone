@@ -107,7 +107,7 @@ export class UsersService {
     return await this.followsRepository.save(follow);
   }
 
-  async getFollower(req: Request): Promise<GetFollowOutputDto[]> {
+  async getFollow(req: Request): Promise<GetFollowOutputDto[]> {
     const follows = await this.followsRepository
       .createQueryBuilder('follows')
       .leftJoin('follows.follower', 'follower')
@@ -117,6 +117,36 @@ export class UsersService {
       .getMany();
 
     return follows;
+  }
+
+  async getFollower(req: Request) {
+    return await this.followsRepository
+      .createQueryBuilder('follows')
+      .leftJoin('follows.following', 'following')
+      .leftJoin('follows.follower', 'follower')
+      .where('follower.id = :followerId', { followerId: req.user })
+      .select([
+        'follows.id',
+        'following.id',
+        'following.nickname',
+        'following.introduce',
+      ])
+      .getMany();
+  }
+
+  async getFollowing(req: Request) {
+    return await this.followsRepository
+      .createQueryBuilder('follows')
+      .leftJoin('follows.following', 'following')
+      .leftJoin('follows.follower', 'follower')
+      .where('following.id = :followingId', { followingId: req.user })
+      .select([
+        'follows.id',
+        'follower.id',
+        'follower.nickname',
+        'follower.introduce',
+      ])
+      .getMany();
   }
 
   async getProfile(param: { userId: string }): Promise<GetProfileOutputDto> {

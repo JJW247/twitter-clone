@@ -94,9 +94,21 @@ export class UsersController {
     type: [GetFollowOutputDto],
   })
   @UseGuards(JwtAuthGuard)
+  @Get('follow')
+  async getFollow(@Req() req: Request) {
+    return await this.usersService.getFollow(req);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('follower')
   async getFollower(@Req() req: Request) {
     return await this.usersService.getFollower(req);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('following')
+  async getFollowing(@Req() req: Request) {
+    return await this.usersService.getFollowing(req);
   }
 
   @ApiOperation({ summary: 'Get user profile infomation.' })
