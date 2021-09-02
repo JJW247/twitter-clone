@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 import { Users } from './users/entities/users.entity';
 import { UsersModule } from './users/users.module';
@@ -12,6 +14,7 @@ import { Likes } from './likes/entities/likes.entity';
 import { Comments } from './comments/entities/comments.entity';
 import { CommentsModule } from './comments/comments.module';
 import { Follows } from './users/entities/follows.entity';
+import { Profiles } from './users/entities/profiles.entity';
 
 @Module({
   imports: [
@@ -30,9 +33,13 @@ import { Follows } from './users/entities/follows.entity';
             password: process.env.DATABASE_PASSWORD,
             database: process.env.DATABASE_DATABASE,
           }),
-      entities: [Users, Tweets, Likes, Comments, Follows],
+      entities: [Users, Tweets, Likes, Comments, Follows, Profiles],
       synchronize: true,
       logging: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
     UsersModule,
     AuthModule,

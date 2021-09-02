@@ -97,13 +97,15 @@ export class TweetsService {
     });
 
     if (comments.length !== 0) {
-      await comments.map((comment) =>
-        this.commentsRepository.softDelete({ id: comment.id }),
+      await Promise.all(
+        comments.map((comment) =>
+          this.commentsRepository.softDelete({ id: comment.id }),
+        ),
       );
     }
     if (likes.length !== 0) {
-      await likes.map((like) =>
-        this.likesRepository.softDelete({ id: like.id }),
+      await Promise.all(
+        likes.map((like) => this.likesRepository.softDelete({ id: like.id })),
       );
     }
 

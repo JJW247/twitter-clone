@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { promisify } from 'util';
+import { unlink } from 'fs';
 
 import { CommonService } from 'src/common/common.service';
 import { CreateUserInputDto, CreateUserOutputDto } from './dtos/createUser.dto';
@@ -15,6 +17,7 @@ import {
   ModifyIntroduceInputDto,
   ModifyIntroduceOutputDto,
 } from './dtos/modifyIntroduce.dto';
+import { Profiles } from './entities/profiles.entity';
 
 @Injectable()
 export class UsersService {
@@ -23,6 +26,8 @@ export class UsersService {
     private readonly usersRepository: Repository<Users>,
     @InjectRepository(Follows)
     private readonly followsRepository: Repository<Follows>,
+    @InjectRepository(Profiles)
+    private readonly profilesRepository: Repository<Profiles>,
     private readonly commonService: CommonService,
     private readonly jwtService: JwtService,
   ) {}
@@ -119,33 +124,35 @@ export class UsersService {
     return follows;
   }
 
-  async getFollower(req: Request) {
+  async getFollowers(param: { userId: string }) {
     return await this.followsRepository
       .createQueryBuilder('follows')
       .leftJoin('follows.following', 'following')
       .leftJoin('follows.follower', 'follower')
-      .where('follower.id = :followerId', { followerId: req.user })
+      .where('follower.id = :followerId', { followerId: param.userId })
       .select([
         'follows.id',
         'following.id',
         'following.nickname',
         'following.introduce',
       ])
+      .orderBy('follows.createdAt', 'ASC')
       .getMany();
   }
 
-  async getFollowing(req: Request) {
+  async getFollowings(param: { userId: string }) {
     return await this.followsRepository
       .createQueryBuilder('follows')
       .leftJoin('follows.following', 'following')
       .leftJoin('follows.follower', 'follower')
-      .where('following.id = :followingId', { followingId: req.user })
+      .where('following.id = :followingId', { followingId: param.userId })
       .select([
         'follows.id',
         'follower.id',
         'follower.nickname',
         'follower.introduce',
       ])
+      .orderBy('follows.createdAt', 'ASC')
       .getMany();
   }
 
@@ -185,5 +192,39 @@ export class UsersService {
     user.introduce = modifyIntroduceInputDto.introduce;
 
     return await this.usersRepository.save(user);
+  }
+
+  async profileImage(req: Request, files: Array<Express.Multer.File>) {
+    const existProfiles = await this.profilesRepository.findOne({
+      where: {
+        user: req.user,
+      },
+    });
+
+    if (existProfiles) {
+      const fileUnlink = promisify(unlink);
+      await fileUnlink(`./uploads/${existProfiles.filename}`);
+
+      await this.profilesRepository.delete({ id: existProfiles.id });
+    }
+
+    const profiles = await this.profilesRepository.create({
+      filename: files[0].filename,
+      originalFilename: files[0].originalname,
+      user: req.user,
+    });
+
+    return await this.profilesRepository.save(profiles);
+  }
+
+  async getProfileImage(param: { userId: string }) {
+    const user = await this.usersRepository
+      .createQueryBuilder('users')
+      .leftJoin('users.profiles', 'profiles')
+      .where('users.id = :userId', { userId: param.userId })
+      .select(['users.id', 'profiles.id', 'profiles.filename'])
+      .getOne();
+
+    return user;
   }
 }

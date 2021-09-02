@@ -6,8 +6,11 @@ import {
   Post,
   Put,
   Req,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -99,16 +102,14 @@ export class UsersController {
     return await this.usersService.getFollow(req);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('follower')
-  async getFollower(@Req() req: Request) {
-    return await this.usersService.getFollower(req);
+  @Get('followers/:userId')
+  async getFollowers(@Param() param: { userId: string }) {
+    return await this.usersService.getFollowers(param);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('following')
-  async getFollowing(@Req() req: Request) {
-    return await this.usersService.getFollowing(req);
+  @Get('followings/:userId')
+  async getFollowings(@Param() param: { userId: string }) {
+    return await this.usersService.getFollowings(param);
   }
 
   @ApiOperation({ summary: 'Get user profile infomation.' })
@@ -140,5 +141,20 @@ export class UsersController {
       req,
       modifyIntroduceInputDto,
     );
+  }
+
+  @Put('profile/image')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AnyFilesInterceptor())
+  async profileImage(
+    @Req() req: Request,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    return await this.usersService.profileImage(req, files);
+  }
+
+  @Get('profile/image/:userId')
+  async getProfileImage(@Param() param: { userId: string }) {
+    return await this.usersService.getProfileImage(param);
   }
 }
