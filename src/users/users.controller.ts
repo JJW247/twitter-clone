@@ -148,7 +148,7 @@ export class UsersController {
   @UseInterceptors(AnyFilesInterceptor())
   async profileImage(
     @Req() req: Request,
-    @UploadedFiles() files: Array<Express.Multer.File>,
+    @UploadedFiles() files: Array<Express.MulterS3.File>,
   ) {
     return await this.usersService.profileImage(req, files);
   }

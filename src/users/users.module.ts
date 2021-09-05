@@ -3,7 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { diskStorage } from 'multer';
+import * as multerS3 from 'multer-s3';
+import * as AWS from 'aws-sdk';
 import { v4 as uuid } from 'uuid';
 import { extname } from 'path';
 
@@ -13,6 +14,20 @@ import { Users } from './entities/users.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { Profiles } from './entities/profiles.entity';
+
+// AWS.config.update({
+//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   region: process.env.AWS_REGION,
+// });
+
+AWS.config.update({
+  accessKeyId: 'AKIA442N3SHGSDP5I54E',
+  secretAccessKey: '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',
+  region: 'ap-northeast-1',
+});
+
+const s3 = new AWS.S3();
 
 @Module({
   imports: [
@@ -37,9 +52,11 @@ import { Profiles } from './entities/profiles.entity';
         limits: {
           fileSize: 1024 * 1024 * 5,
         },
-        storage: diskStorage({
-          destination: configService.get('MULTER_DEST'),
-          filename: (req, file, callback) => {
+        storage: multerS3({
+          s3,
+          bucket: configService.get<string>('AWS_S3_BUCKET_NAME') + '/profiles',
+          acl: 'public-read',
+          key: (req, file, callback) => {
             callback(null, `${uuid()}${extname(file.originalname)}`);
           },
         }),

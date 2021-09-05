@@ -1,8 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { promisify } from 'util';
-import { unlink } from 'fs';
 
 import { CommonService } from 'src/common/common.service';
 import { CreateUserInputDto, CreateUserOutputDto } from './dtos/createUser.dto';
@@ -194,7 +192,7 @@ export class UsersService {
     return await this.usersRepository.save(user);
   }
 
-  async profileImage(req: Request, files: Array<Express.Multer.File>) {
+  async profileImage(req: Request, files: Array<Express.MulterS3.File>) {
     const existProfiles = await this.profilesRepository.findOne({
       where: {
         user: req.user,
@@ -202,14 +200,11 @@ export class UsersService {
     });
 
     if (existProfiles) {
-      const fileUnlink = promisify(unlink);
-      await fileUnlink(`./uploads/${existProfiles.filename}`);
-
       await this.profilesRepository.delete({ id: existProfiles.id });
     }
 
     const profiles = await this.profilesRepository.create({
-      filename: files[0].filename,
+      filename: files[0].key,
       originalFilename: files[0].originalname,
       user: req.user,
     });
