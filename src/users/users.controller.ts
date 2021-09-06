@@ -132,7 +132,7 @@ export class UsersController {
     type: [ModifyIntroduceOutputDto],
   })
   @UseGuards(JwtAuthGuard)
-  @Put('introduce/:userId')
+  @Put('introduce')
   async modifyIntroduce(
     @Req() req: Request,
     @Body() modifyIntroduceInputDto: ModifyIntroduceInputDto,
