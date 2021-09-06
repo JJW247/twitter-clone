@@ -15,16 +15,10 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { Profiles } from './entities/profiles.entity';
 
-// AWS.config.update({
-//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-//   region: process.env.AWS_REGION,
-// });
-
 AWS.config.update({
-  accessKeyId: 'AKIA442N3SHGSDP5I54E',
-  secretAccessKey: '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',
-  region: 'ap-northeast-1',
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
 });
 
 const s3 = new AWS.S3();
@@ -54,7 +48,9 @@ const s3 = new AWS.S3();
         },
         storage: multerS3({
           s3,
-          bucket: configService.get<string>('AWS_S3_BUCKET_NAME') + '/profiles',
+          bucket:
+            configService.get<string>('AWS_S3_BUCKET_NAME') +
+            '/profiles-jjw247',
           acl: 'public-read',
           key: (req, file, callback) => {
             callback(null, `${uuid()}${extname(file.originalname)}`);
