@@ -1,0 +1,2 @@
+### Get Put Test
+GET http://localhost:3010/likes/tweets

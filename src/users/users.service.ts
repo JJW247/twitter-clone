@@ -172,7 +172,10 @@ export class UsersService {
       .getOne();
 
     if (!user)
-      throw new HttpException('Not exist user', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        '존재하지 않는 유저입니다!',
+        HttpStatus.BAD_REQUEST,
+      );
 
     return user;
   }
