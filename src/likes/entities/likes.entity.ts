@@ -16,10 +16,7 @@ export class Likes extends Common {
   @JoinColumn()
   users: Users;
 
-  @ManyToOne(() => Tweets, (tweets) => tweets.likes, {
-    onDelete: 'SET NULL',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(() => Tweets, (tweets) => tweets.likes)
   @JoinColumn()
   tweets?: Tweets;
 }

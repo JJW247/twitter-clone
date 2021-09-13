@@ -14,6 +14,7 @@ import { Users } from './entities/users.entity';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { Profiles } from './entities/profiles.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -25,6 +26,7 @@ const s3 = new AWS.S3();
 
 @Module({
   imports: [
+    AuthModule,
     TypeOrmModule.forFeature([Users, Follows, Profiles]),
     CommonModule,
     JwtModule.registerAsync({

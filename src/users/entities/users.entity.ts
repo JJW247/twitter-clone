@@ -47,6 +47,17 @@ export class Users extends Common {
   @Column('varchar', { default: null })
   introduce: string;
 
+  @Column('boolean', { default: false })
+  verify: boolean;
+
+  @ApiProperty({
+    example: '123456',
+    description: '이메일 인증 코드',
+  })
+  @IsString()
+  @Column('varchar', { default: null })
+  verifyCode: string;
+
   @OneToMany(() => Tweets, (tweets) => tweets.users)
   tweets: Tweets[];
 

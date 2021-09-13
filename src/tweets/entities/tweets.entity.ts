@@ -25,9 +25,13 @@ export class Tweets extends Common {
   @JoinColumn()
   users: Users;
 
-  @OneToMany(() => Likes, (likes) => likes.tweets)
+  @OneToMany(() => Likes, (likes) => likes.tweets, {
+    cascade: ['soft-remove'],
+  })
   likes: Likes[];
 
-  @OneToMany(() => Comments, (comments) => comments.tweets)
+  @OneToMany(() => Comments, (comments) => comments.tweets, {
+    cascade: ['soft-remove'],
+  })
   comments: Comments[];
 }

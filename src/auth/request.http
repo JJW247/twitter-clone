@@ -1,0 +1,8 @@
+### Verify Code
+POST http://localhost:3010/auth/verify
+content-type: application/json
+
+{
+    "email" : "adr10won@gmail.com",
+    "verifyCode" : "841034"   
+}

@@ -80,7 +80,7 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   @Delete(':commentsId')
   async deleteComment(
-    @Req() req,
+    @Req() req: Request,
     @Param() param: { commentsId: string },
   ): Promise<UpdateResult> {
     return await this.commentsService.deleteComment(req, param);

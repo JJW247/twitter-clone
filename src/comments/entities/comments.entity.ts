@@ -23,10 +23,7 @@ export class Comments extends Common {
   @JoinColumn()
   users: Users;
 
-  @ManyToOne(() => Tweets, (tweets) => tweets.comments, {
-    onDelete: 'SET NULL',
-    onUpdate: 'CASCADE',
-  })
+  @ManyToOne(() => Tweets, (tweets) => tweets.comments)
   @JoinColumn()
   tweets: Tweets;
 }

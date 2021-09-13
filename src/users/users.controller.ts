@@ -44,7 +44,7 @@ export class UsersController {
   @Post()
   async createUser(
     @Body() createUserInputDto: CreateUserInputDto,
-  ): Promise<CreateUserOutputDto> {
+  ): Promise<{ email: string; nickname: string }> {
     return await this.usersService.createUser(createUserInputDto);
   }
 

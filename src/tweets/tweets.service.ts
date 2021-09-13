@@ -72,43 +72,55 @@ export class TweetsService {
     param: { tweetsId: string },
   ): Promise<UpdateResult> {
     const tweet = await this.tweetsRepository.findOne({
+      select: ['id'],
       where: {
         id: param.tweetsId,
         users: req.user,
       },
     });
+    const remove = await this.tweetsRepository.softRemove(tweet);
 
-    if (!tweet)
-      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
-
-    const comments = await this.commentsRepository.find({
-      where: {
-        tweets: {
-          id: tweet.id,
-        },
-      },
-    });
-    const likes = await this.likesRepository.find({
-      where: {
-        tweets: {
-          id: tweet.id,
-        },
-      },
-    });
-
-    if (comments.length !== 0) {
-      await Promise.all(
-        comments.map((comment) =>
-          this.commentsRepository.softDelete({ id: comment.id }),
-        ),
-      );
-    }
-    if (likes.length !== 0) {
-      await Promise.all(
-        likes.map((like) => this.likesRepository.softDelete({ id: like.id })),
-      );
+    if (!remove.deletedAt) {
+      throw new HttpException('삭제 실패', HttpStatus.BAD_REQUEST);
     }
 
-    return await this.tweetsRepository.softDelete({ id: +param.tweetsId });
+    const result = new UpdateResult();
+
+    result.affected = 1;
+
+    return result;
+
+    // if (!tweet)
+    //   throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+
+    // const comments = await this.commentsRepository.find({
+    //   where: {
+    //     tweets: {
+    //       id: tweet.id,
+    //     },
+    //   },
+    // });
+    // const likes = await this.likesRepository.find({
+    //   where: {
+    //     tweets: {
+    //       id: tweet.id,
+    //     },
+    //   },
+    // });
+
+    // if (comments.length !== 0) {
+    //   await Promise.all(
+    //     comments.map((comment) =>
+    //       this.commentsRepository.softDelete({ id: comment.id }),
+    //     ),
+    //   );
+    // }
+    // if (likes.length !== 0) {
+    //   await Promise.all(
+    //     likes.map((like) => this.likesRepository.softDelete({ id: like.id })),
+    //   );
+    // }
+
+    // return await this.tweetsRepository.softDelete(tweet);
   }
 }

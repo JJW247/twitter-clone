@@ -16,6 +16,7 @@ import {
   ModifyIntroduceOutputDto,
 } from './dtos/modifyIntroduce.dto';
 import { Profiles } from './entities/profiles.entity';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
@@ -28,24 +29,32 @@ export class UsersService {
     private readonly profilesRepository: Repository<Profiles>,
     private readonly commonService: CommonService,
     private readonly jwtService: JwtService,
+    private readonly authService: AuthService,
   ) {}
 
   async createUser(
     createUserDto: CreateUserInputDto,
-  ): Promise<CreateUserOutputDto> {
+  ): Promise<{ email: string; nickname: string }> {
     const hashedPassword = await this.commonService.hashPassword(
       createUserDto.password,
     );
+
+    const verifyCode: number =
+      Math.floor(Math.random() * (999999 - 111111 + 1)) + 111111;
 
     const user = await this.usersRepository.save({
       email: createUserDto.email,
       nickname: createUserDto.nickname,
       password: hashedPassword,
+      verifyCode: verifyCode.toString(),
     });
 
-    const token = this.jwtService.sign({ id: user.id });
+    await this.authService.sendVerifyEmail(user);
 
-    return { token };
+    return {
+      email: user.email,
+      nickname: user.nickname,
+    };
   }
 
   async login(loginDto: LoginInputDto): Promise<LoginOutputDto> {
@@ -83,6 +92,8 @@ export class UsersService {
       },
     });
 
+    console.log(user);
+
     if (!user)
       throw new HttpException('Not exist user.', HttpStatus.BAD_REQUEST);
     if (req.user === user.id)
@@ -93,8 +104,8 @@ export class UsersService {
 
     const existFollow = await this.followsRepository.findOne({
       where: {
-        follower: req.user,
-        following: user.id,
+        follower: user,
+        following: req.user,
       },
     });
 
@@ -103,8 +114,8 @@ export class UsersService {
       return existFollow;
     }
     const follow = await this.followsRepository.create({
-      follower: req.user,
-      following: user,
+      follower: user,
+      following: req.user,
     });
 
     return await this.followsRepository.save(follow);
