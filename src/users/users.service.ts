@@ -92,8 +92,6 @@ export class UsersService {
       },
     });
 
-    console.log(user);
-
     if (!user)
       throw new HttpException('Not exist user.', HttpStatus.BAD_REQUEST);
     if (req.user === user.id)
@@ -104,7 +102,7 @@ export class UsersService {
 
     const existFollow = await this.followsRepository.findOne({
       where: {
-        follower: user,
+        follower: user.id,
         following: req.user,
       },
     });
@@ -126,9 +124,13 @@ export class UsersService {
       .createQueryBuilder('follows')
       .leftJoin('follows.follower', 'follower')
       .leftJoin('follows.following', 'following')
-      .where('follower.id = :followerId', { followerId: req.user })
+      .where('follower.id = :followerId', { followerId: +req.user })
       .select(['follows.id', 'follower.id', 'following.id'])
       .getMany();
+
+    console.log('-----------------------------------------------------');
+    console.log(req.user);
+    console.log(follows);
 
     return follows;
   }

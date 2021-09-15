@@ -1,0 +1,2 @@
+### Get Profile Info
+GET http://localhost:3010/users/profile/33
